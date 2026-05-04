@@ -1,0 +1,7 @@
+# file names
+texto_criptografado*
+texto_decifrado*
+texto_atacado*
+
+# JAVA
+*.class
