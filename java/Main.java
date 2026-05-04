@@ -3,6 +3,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class Main {
+    static final String DECRYPT_FILE = "texto_decifrado_java.txt";
+    static final String ENCRYPT_FILE = "texto_criptografado_java.txt";
+    static final String ATTACKED_FILE = "texto_atacado_java.txt";
+    static final int ALPHABET_SIZE = 26;
+    static final int ASCII_LOWER_A = 97;
+
     // Frequências do Português
     static final double[] portugueseFreqs = {
         0.1463, // a
@@ -84,9 +90,9 @@ public class Main {
 
             // 3. Salvar o resultado
             try {
-                Files.write(Paths.get("texto_criptografado_java.txt"), cyptedMessage.getBytes());
+                Files.write(Paths.get(ENCRYPT_FILE), cyptedMessage.getBytes());
                 System.out.println("[+] Criptografia concluída!");
-                System.out.println("[+] Arquivo salvo com sucesso: texto_criptografado_java.txt");
+                System.out.println("[+] Arquivo salvo com sucesso: " + ENCRYPT_FILE);
             } catch (IOException e) {
                 System.out.println("Erro ao salvar arquivo: " + e.getMessage());
             }
@@ -101,9 +107,9 @@ public class Main {
             String decryptedMessage = decrypt(message, chave);
 
             try {
-                Files.write(Paths.get("texto_decifrado_java.txt"), decryptedMessage.getBytes());
+                Files.write(Paths.get(DECRYPT_FILE), decryptedMessage.getBytes());
                 System.out.println("[+] Descriptografia concluída!");
-                System.out.println("[+] Arquivo salvo com sucesso: texto_decifrado_java.txt");
+                System.out.println("[+] Arquivo salvo com sucesso: " + DECRYPT_FILE);
             } catch (IOException e) {
                 System.out.println("Erro ao salvar arquivo: " + e.getMessage());
             }
@@ -149,11 +155,11 @@ public class Main {
 
         int nIndexKey = 0;
         for (int i = 0; i < lenMessage; i++) {
-            int nAsciiMessage = message.charAt(i) - 97;
-            int nAsciiKey = key.charAt(nIndexKey) - 97;
+            int nAsciiMessage = message.charAt(i) - ASCII_LOWER_A;
+            int nAsciiKey = key.charAt(nIndexKey) - ASCII_LOWER_A;
 
-            int nAscii = (nAsciiMessage + nAsciiKey) % 26;
-            nAscii = nAscii + 97;
+            int nAscii = (nAsciiMessage + nAsciiKey) % ALPHABET_SIZE;
+            nAscii = nAscii + ASCII_LOWER_A;
 
             result.append((char) nAscii);
             nIndexKey++;
@@ -175,11 +181,11 @@ public class Main {
 
         int nIndexKey = 0;
         for (int i = 0; i < lenMessage; i++) {
-            int nAsciiMessage = message.charAt(i) - 97;
-            int nAsciiKey = key.charAt(nIndexKey) - 97;
+            int nAsciiMessage = message.charAt(i) - ASCII_LOWER_A;
+            int nAsciiKey = key.charAt(nIndexKey) - ASCII_LOWER_A;
 
-            int nAsciiOrigin = (nAsciiMessage - nAsciiKey + 26) % 26;
-            nAsciiOrigin = nAsciiOrigin + 97;
+            int nAsciiOrigin = (nAsciiMessage - nAsciiKey + ALPHABET_SIZE) % ALPHABET_SIZE;
+            nAsciiOrigin = nAsciiOrigin + ASCII_LOWER_A;
             result.append((char) nAsciiOrigin);
 
             nIndexKey++;
@@ -201,9 +207,9 @@ public class Main {
         String originalText = decrypt(message, password);
         
         try {
-            Files.write(Paths.get("texto_atacado_java.txt"), originalText.getBytes());
+            Files.write(Paths.get(ATTACKED_FILE), originalText.getBytes());
             System.out.println("[+] Ataque concluído com sucesso!");
-            System.out.println("[+] O texto atacado foi salvo no arquivo: texto_atacado_java.txt");
+            System.out.println("[+] O texto atacado foi salvo no arquivo: " + ATTACKED_FILE);
         } catch (IOException e) {
             System.out.println("[!] Erro ao salvar o texto atacado: " + e.getMessage());
         }
@@ -223,17 +229,17 @@ public class Main {
             int bestShift = 0;
             double maxScore = 0.0;
 
-            for (int shift = 0; shift < 26; shift++) {
-                int[] decryptedFreqs = new int[26];
+            for (int shift = 0; shift < ALPHABET_SIZE; shift++) {
+                int[] decryptedFreqs = new int[ALPHABET_SIZE];
 
                 for (int i = 0; i < columnText.length(); i++) {
                     char c = columnText.charAt(i);
-                    int decryptedChar = (c - 'a' - shift + 26) % 26;
+                    int decryptedChar = (c - 'a' - shift + ALPHABET_SIZE) % ALPHABET_SIZE;
                     decryptedFreqs[decryptedChar]++;
                 }
 
                 double score = 0.0;
-                for (int charIndex = 0; charIndex < 26; charIndex++) {
+                for (int charIndex = 0; charIndex < ALPHABET_SIZE; charIndex++) {
                     score += decryptedFreqs[charIndex] * portugueseFreqs[charIndex];
                 }
 
@@ -253,7 +259,7 @@ public class Main {
         int n = text.length();
         if (n <= 1) return 0.0;
 
-        int[] freqs = new int[26];
+        int[] freqs = new int[ALPHABET_SIZE];
         for (int i = 0; i < n; i++) {
             char c = text.charAt(i);
             if (c >= 'a' && c <= 'z') {

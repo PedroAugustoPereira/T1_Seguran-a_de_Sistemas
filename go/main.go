@@ -7,6 +7,14 @@ import (
 	"sync"
 )
 
+const (
+	DECRYPT_FILE  string = "texto_decifrado_go.txt"
+	ENCRYPT_FILE  string = "texto_criptografado_go.txt"
+	ATTACKED_FILE string = "texto_atacado_go.txt"
+	ALPHABET_SIZE int    = 26
+	ASCII_LOWER_A int    = 97
+)
+
 func main() {
 	if len(os.Args) < 3 {
 		fmt.Println("Uso correto:")
@@ -39,13 +47,13 @@ func main() {
 		cyptedMessage := crypt(message, chave)
 
 		// 3. Salvar o resultado em arquivo
-		err := os.WriteFile("texto_criptografado_go.txt", []byte(cyptedMessage), 0644)
+		err := os.WriteFile(ENCRYPT_FILE, []byte(cyptedMessage), 0644)
 		if err != nil {
 			fmt.Println("Erro ao salvar arquivo:", err)
 			return
 		}
 		fmt.Println("[+] Criptografia concluída!")
-		fmt.Println("[+] Arquivo salvo com sucesso: texto_criptografado_go.txt")
+		fmt.Println("[+] Arquivo salvo com sucesso:", ENCRYPT_FILE)
 
 	} else if command == "attack" {
 		// Remove espaços/quebras de linha que possam ter vindo do arquivo lido
@@ -71,13 +79,13 @@ func main() {
 		decryptedMessage := decrypt(message, chave)
 
 		// Salva o resultado
-		err := os.WriteFile("texto_decifrado_go.txt", []byte(decryptedMessage), 0644)
+		err := os.WriteFile(DECRYPT_FILE, []byte(decryptedMessage), 0644)
 		if err != nil {
 			fmt.Println("Erro ao salvar arquivo:", err)
 			return
 		}
 		fmt.Println("[+] Descriptografia concluída!")
-		fmt.Println("[+] Arquivo salvo com sucesso: texto_decifrado_go.txt")
+		fmt.Println("[+] Arquivo salvo com sucesso:", DECRYPT_FILE)
 	} else {
 		fmt.Println("Comando inválido. Use 'crypt', 'decrypt' ou 'attack'.")
 	}
@@ -92,12 +100,12 @@ func crypt(message string, key string) string {
 	result := ""
 
 	for i := 0; i < len(message); i++ {
-		nAsciimessage := int(message[i]) - 97
-		nAsciiKey := int(key[nIndexKey]) - 97
+		nAsciimessage := int(message[i]) - ASCII_LOWER_A
+		nAsciiKey := int(key[nIndexKey]) - ASCII_LOWER_A
 
-		nAscii := (nAsciimessage + nAsciiKey) % 26
+		nAscii := (nAsciimessage + nAsciiKey) % ALPHABET_SIZE
 
-		nAscii = nAscii + 97
+		nAscii = nAscii + ASCII_LOWER_A
 
 		result = result + string(rune(nAscii))
 		nIndexKey++
@@ -121,11 +129,11 @@ func decrypt(message string, key string) string {
 	nIndexKey := 0
 
 	for i := 0; i < lenMesage; i++ {
-		nAsciiMessage := int(message[i]) - 97
-		nAsciiKey := int(key[nIndexKey]) - 97
+		nAsciiMessage := int(message[i]) - ASCII_LOWER_A
+		nAsciiKey := int(key[nIndexKey]) - ASCII_LOWER_A
 
-		nAsciiOrigin := (nAsciiMessage - nAsciiKey + 26) % 26
-		nAsciiOrigin = nAsciiOrigin + 97
+		nAsciiOrigin := (nAsciiMessage - nAsciiKey + ALPHABET_SIZE) % ALPHABET_SIZE
+		nAsciiOrigin = nAsciiOrigin + ASCII_LOWER_A
 		result = result + string(rune(nAsciiOrigin))
 
 		nIndexKey++
@@ -155,13 +163,13 @@ func breakingIC(message string) {
 	// Step 3: Decrypt the text to prove it works
 	originalText := decrypt(message, password)
 
-	err := os.WriteFile("texto_atacado_go.txt", []byte(originalText), 0644)
+	err := os.WriteFile(ATTACKED_FILE, []byte(originalText), 0644)
 	if err != nil {
 		fmt.Println("[!] Erro ao salvar o texto decifrado:", err)
 		return
 	}
 	fmt.Println("[+] Ataque concluído com sucesso!")
-	fmt.Println("[+] O texto atacado foi salvo no arquivo: texto_atacado_go.txt")
+	fmt.Println("[+] O texto atacado foi salvo no arquivo:", ATTACKED_FILE)
 }
 
 // DiscoverKey extracts the exact password using Frequency Analysis
@@ -186,16 +194,16 @@ func DiscoverKey(message string, keyLength int) string {
 			bestShift := 0
 			maxScore := 0.0
 
-			for shift := 0; shift < 26; shift++ {
-				decryptedFreqs := make([]int, 26)
+			for shift := 0; shift < ALPHABET_SIZE; shift++ {
+				decryptedFreqs := make([]int, ALPHABET_SIZE)
 
 				for _, char := range columnText {
-					decryptedChar := (int(char-'a') - shift + 26) % 26
+					decryptedChar := (int(char-'a') - shift + ALPHABET_SIZE) % ALPHABET_SIZE
 					decryptedFreqs[decryptedChar]++
 				}
 
 				score := 0.0
-				for charIndex := 0; charIndex < 26; charIndex++ {
+				for charIndex := 0; charIndex < ALPHABET_SIZE; charIndex++ {
 					score += float64(decryptedFreqs[charIndex]) * portugueseFreqs[charIndex]
 				}
 
@@ -275,7 +283,7 @@ func CalculateIC(text string) float64 {
 		return 0.0
 	}
 
-	frequencies := make([]int, 26)
+	frequencies := make([]int, ALPHABET_SIZE)
 
 	for i := 0; i < totalChars; i++ {
 		char := text[i]
