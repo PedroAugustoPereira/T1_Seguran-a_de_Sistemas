@@ -223,7 +223,7 @@ func DiscoverKey(message string, keyLength int) string {
 
 func GetKeyLength(message string) int {
 	var wg sync.WaitGroup
-	maxKeyLength := 10
+	maxKeyLength := 20
 
 	icResults := make([]float64, maxKeyLength+1)
 
